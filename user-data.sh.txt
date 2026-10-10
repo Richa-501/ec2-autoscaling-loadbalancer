@@ -1,0 +1,13 @@
+#!/bin/bash
+sleep 5
+sudo apt-get update
+sudo apt-get install docker.io -y
+sudo systemctl start docker
+
+docker rm -f flask-container || true
+# Maps host port 80 natively to internal container port 5000
+docker run -d \
+  --name host-container \
+  --restart always \
+  -p 80:5000 \
+  flask-app:latest

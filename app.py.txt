@@ -1,0 +1,30 @@
+import socket
+import requests
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    # 1. Grab the clean internal hardware hostname
+    hostname = socket.gethostname()
+    
+    # 2. Extract the Zone through the standard base mapping
+    try:
+        url = "http://169.254.169.254/latest/meta-data/placement/availability-zone"
+        az = requests.get(url, timeout=1.5).text.strip()
+    except Exception:
+        az = "Unavailable"
+
+    return jsonify({
+        "server_hostname": hostname,
+        "aws_zone": az,
+        "status": "Running smoothly!"
+    })
+
+@app.route('/health')
+def health():
+    return "OK", 200
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
